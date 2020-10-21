@@ -6,10 +6,10 @@ url = '/dev/ttyO4'
 baudrate = 115200
 rtscts = False
 
-rx_packet_size = 100 # arbitrary limit imposed by MCP, test with 1.30 firmware?
-tx_packet_size = 20 # arbitrary limit imposed by MCP
+rx_packet_size = 100  # arbitrary limit imposed by MCP, test with 1.30 firmware?
+tx_packet_size = 20  # arbitrary limit imposed by MCP
 tx_sample_packet = str(tx_packet_size) + ''.join(['a' for _ in range(tx_packet_size - len(str(tx_packet_size)) * 2)]) + \
-                   str(tx_packet_size) # '100aaa...aaa100' with len(sample_packet) = 100
+                   str(tx_packet_size)  # '100aaa...aaa100' with len(sample_packet) = 100
 assert len(tx_sample_packet) == tx_packet_size
 
 rx_handle = '0095'
@@ -31,7 +31,7 @@ async def main():
     assert (await rx_message(read_stream)).startswith("CONNECT,1")
     print("\tconnected")
 
-    if (sys.argv[1] == 'rx'):
+    if sys.argv[1] == 'rx':
         while True:
             print("rx mode, awaiting data")
             res = await rx_message(read_stream)
@@ -47,7 +47,6 @@ async def main():
             input("Press enter to transmit")
             print("transmitting")
             await tx_message(write_stream, "SHW,{},{}".format(tx_handle, tx_encode(tx_sample_packet)))
-
 
 
 async def reboot(read_stream, write_stream):
@@ -88,6 +87,7 @@ async def rx_message(read_stream, begin_delimiter='%', end_delimiter='%'):
 
     return message
 
+
 def rx_decode(message):
     # unpack string of ASCII-encoded hex which itself encodes ASCII
     return bytes.fromhex(message).decode('ascii')
@@ -106,10 +106,11 @@ async def tx_message(write_stream, message, end_delimiter='\n'):
     print("\ttx drained: <{}>".format(repr(message + end_delimiter)))
     # repr -> replace special characters with escape sequences
 
+
 def tx_encode(payload):
     # pack string to ASCII-encoded hex string
     return payload.encode('ascii').hex()
 
+
 if __name__ == "__main__":
     asyncio.run(main())
-

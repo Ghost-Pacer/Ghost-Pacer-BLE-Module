@@ -16,7 +16,6 @@ tx_packet_size = 20  # arbitrary limit imposed by MCP
 rx_handle = '0095'
 tx_handle = '0092'
 
-
 async def main():
     read_stream, write_stream = await serial_asyncio.open_serial_connection(url=url, baudrate=baudrate, rtscts=rtscts)
     print("serial streams created\n")
@@ -41,6 +40,7 @@ async def main():
 
 
 async def flush_read_stream(read_stream: StreamReader):
+    # TODO
     pass
 
 
@@ -68,11 +68,15 @@ async def reboot(read_stream: StreamReader, write_stream: StreamWriter):
     assert await rx_message(read_stream, begin_delimiter='', end_delimiter='>') == "CMD"
 
 
+# ***** RECEIVE DATA *****
+
 async def rx_packet_count(read_stream: StreamReader) -> int:
-    return 0
+    # Assumes this is called before starting to receive all packets
+    return int(await rx_packet(read_stream))
 
 
 async def rx_client_is_notifiable(read_stream: StreamReader) -> bool:
+    # Assumes already in transmit mode
     print("tx mode")
     print("waiting for subscribe to indicate")
     return (await rx_message(read_stream)).startswith("WC")
@@ -86,19 +90,6 @@ async def rx_packet(read_stream: StreamReader) -> str:
     decoded_payload = rx_decode(payload)
     print("rx payload (length {}): {}".format(len(payload), decoded_payload))
     return decoded_payload
-
-
-def serialize_run(runData) -> List[str]:
-    tx_sample_packet = str(tx_packet_size) + ''.join(
-        ['a' for _ in range(tx_packet_size - len(str(tx_packet_size)) * 2)]) + \
-                       str(tx_packet_size)
-    assert len(tx_sample_packet) == tx_packet_size
-    packets = [tx_sample_packet]
-    return packets
-
-
-def deserialize_run():
-    pass
 
 
 async def rx_message(read_stream: StreamReader, begin_delimiter: str = '%', end_delimiter: str = '%') -> str:
@@ -119,8 +110,10 @@ def rx_decode(message: str) -> str:
     return bytes.fromhex(message).decode('ascii')
 
 
+# ***** TRANSMIT DATA *****
+
 async def tx_packet_count(write_stream: StreamWriter, packet_count: int):
-    pass
+    await tx_packet(write_stream, str(packet_count))
 
 
 async def tx_packet(write_stream: StreamWriter, packet: str):

@@ -1,6 +1,10 @@
 import asyncio
 import serial_asyncio
 import sys
+from typing import List
+
+StreamReader = asyncio.StreamReader
+StreamWriter = asyncio.StreamWriter
 
 url = '/dev/ttyO4'
 baudrate = 115200
@@ -16,7 +20,9 @@ tx_handle = '0092'
 async def main():
     read_stream, write_stream = await serial_asyncio.open_serial_connection(url=url, baudrate=baudrate, rtscts=rtscts)
     print("serial streams created\n")
-    await handshake(read_stream, write_stream)
+    assert await handshake(read_stream, write_stream)
+    print("\tconnected")
+
     if sys.argv[1] == 'rx':
         packet_count = await rx_packet_count(read_stream)
         packets = []
@@ -34,14 +40,17 @@ async def main():
             await tx_packet(write_stream, packets[i])
 
 
-async def handshake(read_stream, write_stream):
+async def flush_read_stream(read_stream: StreamReader):
+    pass
+
+
+async def handshake(read_stream: StreamReader, write_stream: StreamWriter) -> bool:
     await reboot(read_stream, write_stream)
     print("waiting for connect")
-    assert (await rx_message(read_stream)).startswith("CONNECT,1")
-    print("\tconnected")
+    return (await rx_message(read_stream)).startswith("CONNECT,1")
 
 
-async def reboot(read_stream, write_stream):
+async def reboot(read_stream: StreamReader, write_stream: StreamWriter):
     # assume not in command mode
     print("rebooting")
     await tx_message(write_stream, "$$$", end_delimiter='')
@@ -59,26 +68,27 @@ async def reboot(read_stream, write_stream):
     assert await rx_message(read_stream, begin_delimiter='', end_delimiter='>') == "CMD"
 
 
-async def rx_packet_count(read_stream):
+async def rx_packet_count(read_stream: StreamReader) -> int:
     return 0
 
 
-async def rx_client_is_notifiable(read_stream):
+async def rx_client_is_notifiable(read_stream: StreamReader) -> bool:
     print("tx mode")
     print("waiting for subscribe to indicate")
     return (await rx_message(read_stream)).startswith("WC")
 
 
-async def rx_packet(read_stream):
+async def rx_packet(read_stream: StreamReader) -> str:
     print("rx mode, awaiting data")
     res = await rx_message(read_stream)
     assert res.startswith("WV")
     payload = res.split(',')[-1]
-    print("rx payload (length {}): {}".format(len(payload), rx_decode(payload)))
-    return payload
+    decoded_payload = rx_decode(payload)
+    print("rx payload (length {}): {}".format(len(payload), decoded_payload))
+    return decoded_payload
 
 
-def serialize_run(runData):
+def serialize_run(runData) -> List[str]:
     tx_sample_packet = str(tx_packet_size) + ''.join(
         ['a' for _ in range(tx_packet_size - len(str(tx_packet_size)) * 2)]) + \
                        str(tx_packet_size)
@@ -91,7 +101,7 @@ def deserialize_run():
     pass
 
 
-async def rx_message(read_stream, begin_delimiter='%', end_delimiter='%'):
+async def rx_message(read_stream: StreamReader, begin_delimiter: str = '%', end_delimiter: str = '%') -> str:
     if begin_delimiter:
         print("rx awaiting begin delimiter...")
         raw_delim = await read_stream.readuntil(begin_delimiter.encode('ascii'))
@@ -104,23 +114,23 @@ async def rx_message(read_stream, begin_delimiter='%', end_delimiter='%'):
     return message
 
 
-def rx_decode(message):
+def rx_decode(message: str) -> str:
     # unpack string of ASCII-encoded hex which itself encodes ASCII
     return bytes.fromhex(message).decode('ascii')
 
 
-async def tx_packet_count(write_stream, packet_count):
+async def tx_packet_count(write_stream: StreamWriter, packet_count: int):
     pass
 
 
-async def tx_packet(write_stream, packet):
+async def tx_packet(write_stream: StreamWriter, packet: str):
     input("Press enter to transmit")
     print("transmitting")
     encoded_packet = tx_encode(packet)
     await tx_message(write_stream, "SHW,{},{}".format(tx_handle, encoded_packet))
 
 
-async def tx_message(write_stream, message, end_delimiter='\n'):
+async def tx_message(write_stream: StreamWriter, message: str, end_delimiter: str = '\n'):
     complete_message = message
     if end_delimiter is not None:
         complete_message += end_delimiter
@@ -131,7 +141,7 @@ async def tx_message(write_stream, message, end_delimiter='\n'):
     # repr -> replace special characters with escape sequences
 
 
-def tx_encode(payload):
+def tx_encode(payload: str) -> str:
     # pack string to ASCII-encoded hex string
     return payload.encode('ascii').hex()
 

@@ -61,7 +61,7 @@ handle_table = {
         '0081': 'heart_rate'
 }
 
-WatchData = namedtuple('WatchData', handle_table.values())
+WatchData = namedtuple('WatchData', "lat lon elev speed heart_rate")
 # PyCharm (and maybe other IDEs?) doesn't properly handle a namedtuple constructed from potentially dynamic data
 # to fix syntax highlighting replace handle_table.values() with "lat lon elev speed heart_rate"
 

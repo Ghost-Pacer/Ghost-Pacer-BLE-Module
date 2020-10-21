@@ -1,5 +1,6 @@
 import runup1_pb2 as RunUp
 import rundown1_pb2 as RunDown
+import RN4870 as BLEModule
 
 from collections import namedtuple
 import typing

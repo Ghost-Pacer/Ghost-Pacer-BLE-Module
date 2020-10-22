@@ -33,14 +33,8 @@ async def open_connection(transfer_type: TransferType):
     print("serial streams created\n")
     assert await _handshake()
     print("\tconnected")
-    _flush_stream(transfer_type)
-    if TransferType.WRITE:
+    if transfer_type == TransferType.WRITE:
         assert await _rx_client_is_notifiable()
-
-
-def _flush_stream(stream_type: TransferType):
-    # TODO
-    pass
 
 
 async def _handshake() -> bool:
@@ -65,6 +59,12 @@ async def _reboot():
     assert await _rx_message() == "REBOOT"
     await _tx_message("$$$", end_delimiter='')
     assert await _rx_message(begin_delimiter='', end_delimiter='>') == "CMD"
+
+
+async def close_connection(transfer_type: TransferType):
+    if transfer_type == TransferType.WRITE:
+        write_stream.close()
+        await write_stream.wait_closed()
 
 
 # ***** RECEIVE DATA *****

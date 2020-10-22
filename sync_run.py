@@ -13,6 +13,7 @@ async def rx_run() -> RunDown.Run:
     for i in range(packet_count):
         received_packet = await ble_module.rx_packet()
         packets.append(received_packet)
+    await ble_module.close_connection(transfer_type)
     return deserialize_run(packets)
 
     # Await a complete run being sent
@@ -37,6 +38,7 @@ async def tx_run(run: RunUp.Run) -> None:
     await ble_module.tx_packet_count(packet_count)
     for i in range(packet_count):
         await ble_module.tx_packet(packets[i])
+    await ble_module.close_connection(transfer_type)
 
     # Take a Protobuf run object, serialize, chunk, and send
     # First message should be the number of following messages (i.e. num chunks)

@@ -81,7 +81,7 @@ async def _rx_client_is_notifiable() -> bool:
     return (await _rx_message()).startswith("WC")
 
 
-async def rx_packet() -> str:
+async def rx_packet() -> bytes:
     print("rx mode, awaiting data")
     res = await _rx_message()
     assert res.startswith("WV")
@@ -104,18 +104,19 @@ async def _rx_message(begin_delimiter: str = '%', end_delimiter: str = '%') -> s
     return message
 
 
-def _rx_decode(message: str) -> str:
-    # unpack string of ASCII-encoded hex which itself encodes ASCII
-    return bytes.fromhex(message).decode('ascii')
+def _rx_decode(message: str) -> bytes:
+    return bytes.fromhex(message)
 
 
 # ***** TRANSMIT DATA *****
 
 async def tx_packet_count(packet_count: int):
-    await tx_packet(str(packet_count))
+    packet_count_string = str(packet_count)
+    packet_count_bytes = bytes.fromhex(packet_count_string)
+    await tx_packet(packet_count_bytes)
 
 
-async def tx_packet(packet: str):
+async def tx_packet(packet: bytes):
     input("Press enter to transmit")
     print("transmitting")
     encoded_packet = _tx_encode(packet)
@@ -133,6 +134,5 @@ async def _tx_message(message: str, end_delimiter: str = '\n'):
     # repr -> replace special characters with escape sequences
 
 
-def _tx_encode(payload: str) -> str:
-    # pack string to ASCII-encoded hex string
-    return payload.encode('ascii').hex()
+def _tx_encode(payload: bytes) -> str:
+    return payload.hex()

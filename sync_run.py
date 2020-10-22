@@ -9,7 +9,7 @@ async def rx_run() -> RunDown.Run:
     transfer_type = ble_module.TransferType.READ
     await ble_module.open_connection(transfer_type)
     packet_count = await ble_module.rx_packet_count()
-    packets: List[str] = []
+    packets: List[bytes] = []
     for i in range(packet_count):
         received_packet = await ble_module.rx_packet()
         packets.append(received_packet)
@@ -45,17 +45,17 @@ async def tx_run(run: RunUp.Run) -> None:
     # Obviously individual chunks will need to be MCP encoded
 
 
-def serialize_run(runData: RunUp.Run) -> List[str]:
+def serialize_run(runData: RunUp.Run) -> List[bytes]:
     # TODO
     tx_packet_size = ble_module.TX_PACKET_SIZE
     tx_sample_packet = str(tx_packet_size) + ''.join(
         ['a' for _ in range(tx_packet_size - len(str(tx_packet_size)) * 2)]) + \
                        str(tx_packet_size)
     assert len(tx_sample_packet) == tx_packet_size
-    packets = [tx_sample_packet]
+    packets = [bytes.fromhex(tx_sample_packet)]
     return packets
 
 
-def deserialize_run(packets: List[str]) -> RunDown.Run:
+def deserialize_run(packets: List[bytes]) -> RunDown.Run:
     # TODO
-    pass
+    return RunDown.Run()

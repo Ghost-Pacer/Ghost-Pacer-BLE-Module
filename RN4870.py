@@ -70,7 +70,8 @@ async def close_connection(transfer_type: TransferType):
 
 async def rx_packet_count() -> int:
     # Assumes this is called before starting to receive all packets
-    return int(await rx_packet())
+    _, payload = await rx_packet()
+    return int(payload)
 
 
 async def _rx_client_is_notifiable() -> bool:
@@ -80,14 +81,16 @@ async def _rx_client_is_notifiable() -> bool:
     return (await _rx_message()).startswith("WC")
 
 
-async def rx_packet() -> bytes:
+async def rx_packet() -> (str, bytes):
     print("rx mode, awaiting data")
     res = await _rx_message()
     assert res.startswith("WV")
+    handle = res.split(',')[1]
     payload = res.split(',')[-1]
+    decoded_handle = _rx_decode(handle).decode("ascii")
     decoded_payload = _rx_decode(payload)
     print("rx payload (length {}): {}".format(len(payload), decoded_payload))
-    return decoded_payload
+    return decoded_handle, decoded_payload
 
 
 async def _rx_message(begin_delimiter: str = '%', end_delimiter: str = '%') -> str:

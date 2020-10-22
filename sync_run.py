@@ -11,7 +11,7 @@ async def rx_run() -> RunDown.Run:
     packet_count = await ble_module.rx_packet_count()
     packets: List[bytes] = []
     for i in range(packet_count):
-        received_packet = await ble_module.rx_packet()
+        _, received_packet = await ble_module.rx_packet()
         packets.append(received_packet)
     await ble_module.close_connection(transfer_type)
     return deserialize_run(packets)

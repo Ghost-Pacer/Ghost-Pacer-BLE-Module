@@ -1,6 +1,5 @@
 import asyncio
 import serial_asyncio
-import sys
 from enum import Enum
 
 StreamReader = asyncio.StreamReader

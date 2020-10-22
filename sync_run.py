@@ -1,11 +1,12 @@
 from typing import List
 
-import runup1_pb2 as RunUp
-import rundown1_pb2 as RunDown
+import runup1_pb2 as run_up
+import rundown1_pb2 as run_down
 import RN4870 as ble_module
+import google.protobuf as protobuf
 
 
-async def rx_run() -> RunDown.Run:
+async def rx_run() -> run_down.DownloadedRun:
     if not ble_module.is_connected():
         print("ERROR: Tried reading without active connection")
         return
@@ -19,7 +20,7 @@ async def rx_run() -> RunDown.Run:
     return deserialize_run(packets)
 
 
-async def tx_run(run: RunUp.Run) -> None:
+async def tx_run(run: run_up.UploadedRun):
     if not ble_module.is_connected():
         print("ERROR: Tried writing without active connection")
         return
@@ -33,7 +34,7 @@ async def tx_run(run: RunUp.Run) -> None:
         await ble_module.tx_packet(packets[i])
 
 
-def serialize_run(runData: RunUp.Run) -> List[bytes]:
+def serialize_run(run_data: run_up.UploadedRun) -> List[bytes]:
     # TODO
     tx_packet_size = ble_module.TX_PACKET_SIZE
     tx_sample_packet = str(tx_packet_size) + ''.join(
@@ -44,6 +45,12 @@ def serialize_run(runData: RunUp.Run) -> List[bytes]:
     return packets
 
 
-def deserialize_run(packets: List[bytes]) -> RunDown.Run:
+def deserialize_run(packets: List[bytes]) -> run_down.DownloadedRun:
     # TODO
-    return RunDown.Run()
+    test: str = "Test string of bytes"
+    return None
+
+
+if __name__ == "__main__":
+    print("hello!!!!")
+

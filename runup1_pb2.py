@@ -19,78 +19,78 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0crunup1.proto\x12\nghostpacer\"\xc6\x01\n\x03Run\x12\x15\n\rtotalDistance\x18\x01 \x01(\x02\x12\x11\n\tstartTime\x18\x02 \x01(\x02\x12\x10\n\x08startLat\x18\x03 \x01(\x02\x12\x10\n\x08startLon\x18\x04 \x01(\x02\x12\x17\n\x0b\x63ompLatDist\x18\x05 \x03(\x02\x42\x02\x10\x01\x12\x13\n\x07\x63ompLat\x18\x06 \x03(\x02\x42\x02\x10\x01\x12\x17\n\x0b\x63ompLonDist\x18\x07 \x03(\x02\x42\x02\x10\x01\x12\x13\n\x07\x63ompLon\x18\x08 \x03(\x02\x42\x02\x10\x01\x12\x15\n\tsavedTime\x18\t \x03(\x02\x42\x02\x10\x01\x62\x06proto3'
+  serialized_pb=b'\n\x0crunup1.proto\x12\nghostpacer\"\xce\x01\n\x0bUploadedRun\x12\x15\n\rtotalDistance\x18\x01 \x01(\x02\x12\x11\n\tstartTime\x18\x02 \x01(\x02\x12\x10\n\x08startLat\x18\x03 \x01(\x02\x12\x10\n\x08startLon\x18\x04 \x01(\x02\x12\x17\n\x0b\x63ompLatDist\x18\x05 \x03(\x02\x42\x02\x10\x01\x12\x13\n\x07\x63ompLat\x18\x06 \x03(\x02\x42\x02\x10\x01\x12\x17\n\x0b\x63ompLonDist\x18\x07 \x03(\x02\x42\x02\x10\x01\x12\x13\n\x07\x63ompLon\x18\x08 \x03(\x02\x42\x02\x10\x01\x12\x15\n\tsavedTime\x18\t \x03(\x02\x42\x02\x10\x01\x62\x06proto3'
 )
 
 
 
 
-_RUN = _descriptor.Descriptor(
-  name='Run',
-  full_name='ghostpacer.Run',
+_UPLOADEDRUN = _descriptor.Descriptor(
+  name='UploadedRun',
+  full_name='ghostpacer.UploadedRun',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='totalDistance', full_name='ghostpacer.Run.totalDistance', index=0,
+      name='totalDistance', full_name='ghostpacer.UploadedRun.totalDistance', index=0,
       number=1, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='startTime', full_name='ghostpacer.Run.startTime', index=1,
+      name='startTime', full_name='ghostpacer.UploadedRun.startTime', index=1,
       number=2, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='startLat', full_name='ghostpacer.Run.startLat', index=2,
+      name='startLat', full_name='ghostpacer.UploadedRun.startLat', index=2,
       number=3, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='startLon', full_name='ghostpacer.Run.startLon', index=3,
+      name='startLon', full_name='ghostpacer.UploadedRun.startLon', index=3,
       number=4, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='compLatDist', full_name='ghostpacer.Run.compLatDist', index=4,
+      name='compLatDist', full_name='ghostpacer.UploadedRun.compLatDist', index=4,
       number=5, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='compLat', full_name='ghostpacer.Run.compLat', index=5,
+      name='compLat', full_name='ghostpacer.UploadedRun.compLat', index=5,
       number=6, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='compLonDist', full_name='ghostpacer.Run.compLonDist', index=6,
+      name='compLonDist', full_name='ghostpacer.UploadedRun.compLonDist', index=6,
       number=7, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='compLon', full_name='ghostpacer.Run.compLon', index=7,
+      name='compLon', full_name='ghostpacer.UploadedRun.compLon', index=7,
       number=8, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='savedTime', full_name='ghostpacer.Run.savedTime', index=8,
+      name='savedTime', full_name='ghostpacer.UploadedRun.savedTime', index=8,
       number=9, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -109,23 +109,23 @@ _RUN = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=29,
-  serialized_end=227,
+  serialized_end=235,
 )
 
-DESCRIPTOR.message_types_by_name['Run'] = _RUN
+DESCRIPTOR.message_types_by_name['UploadedRun'] = _UPLOADEDRUN
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-Run = _reflection.GeneratedProtocolMessageType('Run', (_message.Message,), {
-  'DESCRIPTOR' : _RUN,
+UploadedRun = _reflection.GeneratedProtocolMessageType('UploadedRun', (_message.Message,), {
+  'DESCRIPTOR' : _UPLOADEDRUN,
   '__module__' : 'runup1_pb2'
-  # @@protoc_insertion_point(class_scope:ghostpacer.Run)
+  # @@protoc_insertion_point(class_scope:ghostpacer.UploadedRun)
   })
-_sym_db.RegisterMessage(Run)
+_sym_db.RegisterMessage(UploadedRun)
 
 
-_RUN.fields_by_name['compLatDist']._options = None
-_RUN.fields_by_name['compLat']._options = None
-_RUN.fields_by_name['compLonDist']._options = None
-_RUN.fields_by_name['compLon']._options = None
-_RUN.fields_by_name['savedTime']._options = None
+_UPLOADEDRUN.fields_by_name['compLatDist']._options = None
+_UPLOADEDRUN.fields_by_name['compLat']._options = None
+_UPLOADEDRUN.fields_by_name['compLonDist']._options = None
+_UPLOADEDRUN.fields_by_name['compLon']._options = None
+_UPLOADEDRUN.fields_by_name['savedTime']._options = None
 # @@protoc_insertion_point(module_scope)

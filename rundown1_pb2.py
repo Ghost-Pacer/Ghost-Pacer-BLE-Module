@@ -19,71 +19,71 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0erundown1.proto\x12\nghostpacer\"\xa4\x01\n\x03Run\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08startLat\x18\x02 \x01(\x02\x12\x10\n\x08startLon\x18\x03 \x01(\x02\x12\x11\n\tmileSplit\x18\x04 \x01(\x02\x12\x14\n\x08pointLat\x18\x05 \x03(\x02\x42\x02\x10\x01\x12\x14\n\x08pointLon\x18\x06 \x03(\x02\x42\x02\x10\x01\x12\x15\n\tpointElev\x18\x07 \x03(\x02\x42\x02\x10\x01\x12\x15\n\tsavedTime\x18\x08 \x03(\x02\x42\x02\x10\x01\x62\x06proto3'
+  serialized_pb=b'\n\x0erundown1.proto\x12\nghostpacer\"\xae\x01\n\rDownloadedRun\x12\x0c\n\x04name\x18\x01 \x01(\t\x12\x10\n\x08startLat\x18\x02 \x01(\x02\x12\x10\n\x08startLon\x18\x03 \x01(\x02\x12\x11\n\tmileSplit\x18\x04 \x01(\x02\x12\x14\n\x08pointLat\x18\x05 \x03(\x02\x42\x02\x10\x01\x12\x14\n\x08pointLon\x18\x06 \x03(\x02\x42\x02\x10\x01\x12\x15\n\tpointElev\x18\x07 \x03(\x02\x42\x02\x10\x01\x12\x15\n\tsavedTime\x18\x08 \x03(\x02\x42\x02\x10\x01\x62\x06proto3'
 )
 
 
 
 
-_RUN = _descriptor.Descriptor(
-  name='Run',
-  full_name='ghostpacer.Run',
+_DOWNLOADEDRUN = _descriptor.Descriptor(
+  name='DownloadedRun',
+  full_name='ghostpacer.DownloadedRun',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='name', full_name='ghostpacer.Run.name', index=0,
+      name='name', full_name='ghostpacer.DownloadedRun.name', index=0,
       number=1, type=9, cpp_type=9, label=1,
       has_default_value=False, default_value=b"".decode('utf-8'),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='startLat', full_name='ghostpacer.Run.startLat', index=1,
+      name='startLat', full_name='ghostpacer.DownloadedRun.startLat', index=1,
       number=2, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='startLon', full_name='ghostpacer.Run.startLon', index=2,
+      name='startLon', full_name='ghostpacer.DownloadedRun.startLon', index=2,
       number=3, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='mileSplit', full_name='ghostpacer.Run.mileSplit', index=3,
+      name='mileSplit', full_name='ghostpacer.DownloadedRun.mileSplit', index=3,
       number=4, type=2, cpp_type=6, label=1,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='pointLat', full_name='ghostpacer.Run.pointLat', index=4,
+      name='pointLat', full_name='ghostpacer.DownloadedRun.pointLat', index=4,
       number=5, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='pointLon', full_name='ghostpacer.Run.pointLon', index=5,
+      name='pointLon', full_name='ghostpacer.DownloadedRun.pointLon', index=5,
       number=6, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='pointElev', full_name='ghostpacer.Run.pointElev', index=6,
+      name='pointElev', full_name='ghostpacer.DownloadedRun.pointElev', index=6,
       number=7, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=b'\020\001', file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='savedTime', full_name='ghostpacer.Run.savedTime', index=7,
+      name='savedTime', full_name='ghostpacer.DownloadedRun.savedTime', index=7,
       number=8, type=2, cpp_type=6, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -102,22 +102,22 @@ _RUN = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=31,
-  serialized_end=195,
+  serialized_end=205,
 )
 
-DESCRIPTOR.message_types_by_name['Run'] = _RUN
+DESCRIPTOR.message_types_by_name['DownloadedRun'] = _DOWNLOADEDRUN
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-Run = _reflection.GeneratedProtocolMessageType('Run', (_message.Message,), {
-  'DESCRIPTOR' : _RUN,
+DownloadedRun = _reflection.GeneratedProtocolMessageType('DownloadedRun', (_message.Message,), {
+  'DESCRIPTOR' : _DOWNLOADEDRUN,
   '__module__' : 'rundown1_pb2'
-  # @@protoc_insertion_point(class_scope:ghostpacer.Run)
+  # @@protoc_insertion_point(class_scope:ghostpacer.DownloadedRun)
   })
-_sym_db.RegisterMessage(Run)
+_sym_db.RegisterMessage(DownloadedRun)
 
 
-_RUN.fields_by_name['pointLat']._options = None
-_RUN.fields_by_name['pointLon']._options = None
-_RUN.fields_by_name['pointElev']._options = None
-_RUN.fields_by_name['savedTime']._options = None
+_DOWNLOADEDRUN.fields_by_name['pointLat']._options = None
+_DOWNLOADEDRUN.fields_by_name['pointLon']._options = None
+_DOWNLOADEDRUN.fields_by_name['pointElev']._options = None
+_DOWNLOADEDRUN.fields_by_name['savedTime']._options = None
 # @@protoc_insertion_point(module_scope)

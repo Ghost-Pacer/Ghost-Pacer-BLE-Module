@@ -1,98 +1,97 @@
 import asyncio
 import serial_asyncio
 import sys
-from typing import List
+from enum import Enum
 
 StreamReader = asyncio.StreamReader
 StreamWriter = asyncio.StreamWriter
 
-url = '/dev/ttyO4'
-baudrate = 115200
-rtscts = False
+URL = '/dev/ttyO4'
+BAUDRATE = 115200
+RTSCTS = False
 
-rx_packet_size = 100  # arbitrary limit imposed by MCP, test with 1.30 firmware?
-tx_packet_size = 20  # arbitrary limit imposed by MCP
+RX_PACKET_SIZE = 100  # arbitrary limit imposed by MCP, test with 1.30 firmware?
+TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
 
-rx_handle = '0095'
-tx_handle = '0092'
+RX_HANDLE = '0095'
+TX_HANDLE = '0092'
 
-async def main():
-    read_stream, write_stream = await serial_asyncio.open_serial_connection(url=url, baudrate=baudrate, rtscts=rtscts)
+read_stream: StreamReader
+write_stream: StreamWriter
+
+
+class TransferType(Enum):
+    READ = 0
+    WRITE = 1
+
+
+# ***** ESTABLISH CONNECTION *****
+
+async def open_connection(transfer_type: TransferType):
+    global read_stream, write_stream
+    read_stream, write_stream = await serial_asyncio.open_serial_connection(url=URL, baudrate=BAUDRATE, rtscts=RTSCTS)
     print("serial streams created\n")
-    assert await handshake(read_stream, write_stream)
+    assert await _handshake()
     print("\tconnected")
-
-    if sys.argv[1] == 'rx':
-        packet_count = await rx_packet_count(read_stream)
-        packets = []
-        for i in range(packet_count):
-            payload = rx_packet(read_stream)
-            packets.append(payload)
-        serialize_run(packets)
-    else:
-        assert await rx_client_is_notifiable(read_stream)
-        print("subscribed")
-        packets = serialize_run(None)
-        packet_count = len(packets)
-        await tx_packet_count(write_stream, packet_count)
-        for i in range(packet_count):
-            await tx_packet(write_stream, packets[i])
+    _flush_stream(transfer_type)
+    if TransferType.WRITE:
+        assert await _rx_client_is_notifiable()
 
 
-async def flush_read_stream(read_stream: StreamReader):
+def _flush_stream(stream_type: TransferType):
     # TODO
     pass
 
 
-async def handshake(read_stream: StreamReader, write_stream: StreamWriter) -> bool:
-    await reboot(read_stream, write_stream)
+async def _handshake() -> bool:
+    await _reboot()
     print("waiting for connect")
-    return (await rx_message(read_stream)).startswith("CONNECT,1")
+    return (await _rx_message()).startswith("CONNECT,1")
 
 
-async def reboot(read_stream: StreamReader, write_stream: StreamWriter):
+async def _reboot():
     # assume not in command mode
     print("rebooting")
-    await tx_message(write_stream, "$$$", end_delimiter='')
+    await _tx_message("$$$", end_delimiter='')
     try:
         # wait up to 1 sec for CMD>
-        res = await asyncio.wait_for(rx_message(read_stream, begin_delimiter='', end_delimiter='>'), timeout=1.0)
+        res = await asyncio.wait_for(_rx_message(begin_delimiter='', end_delimiter='>'), timeout=1.0)
     except asyncio.TimeoutError:
         # nothing back, so already in command mode
         # send newline to clear, will error out
-        await tx_message(write_stream, "")
-        assert "Err" in await rx_message(read_stream, begin_delimiter='', end_delimiter='>')
-    await tx_message(write_stream, "R,1")
-    assert await rx_message(read_stream) == "REBOOT"
-    await tx_message(write_stream, "$$$", end_delimiter='')
-    assert await rx_message(read_stream, begin_delimiter='', end_delimiter='>') == "CMD"
+        await _tx_message("")
+        assert "Err" in await _rx_message(begin_delimiter='', end_delimiter='>')
+    await _tx_message("R,1")
+    assert await _rx_message() == "REBOOT"
+    await _tx_message("$$$", end_delimiter='')
+    assert await _rx_message(begin_delimiter='', end_delimiter='>') == "CMD"
 
 
 # ***** RECEIVE DATA *****
 
-async def rx_packet_count(read_stream: StreamReader) -> int:
+async def rx_packet_count() -> int:
     # Assumes this is called before starting to receive all packets
-    return int(await rx_packet(read_stream))
+    return int(await rx_packet())
 
 
-async def rx_client_is_notifiable(read_stream: StreamReader) -> bool:
+async def _rx_client_is_notifiable() -> bool:
     # Assumes already in transmit mode
     print("tx mode")
     print("waiting for subscribe to indicate")
-    return (await rx_message(read_stream)).startswith("WC")
+    return (await _rx_message()).startswith("WC")
 
 
-async def rx_packet(read_stream: StreamReader) -> str:
+async def rx_packet() -> str:
     print("rx mode, awaiting data")
-    res = await rx_message(read_stream)
+    res = await _rx_message()
     assert res.startswith("WV")
     payload = res.split(',')[-1]
-    decoded_payload = rx_decode(payload)
+    decoded_payload = _rx_decode(payload)
     print("rx payload (length {}): {}".format(len(payload), decoded_payload))
     return decoded_payload
 
 
-async def rx_message(read_stream: StreamReader, begin_delimiter: str = '%', end_delimiter: str = '%') -> str:
+async def _rx_message(begin_delimiter: str = '%', end_delimiter: str = '%') -> str:
     if begin_delimiter:
         print("rx awaiting begin delimiter...")
         raw_delim = await read_stream.readuntil(begin_delimiter.encode('ascii'))
@@ -105,25 +104,25 @@ async def rx_message(read_stream: StreamReader, begin_delimiter: str = '%', end_
     return message
 
 
-def rx_decode(message: str) -> str:
+def _rx_decode(message: str) -> str:
     # unpack string of ASCII-encoded hex which itself encodes ASCII
     return bytes.fromhex(message).decode('ascii')
 
 
 # ***** TRANSMIT DATA *****
 
-async def tx_packet_count(write_stream: StreamWriter, packet_count: int):
-    await tx_packet(write_stream, str(packet_count))
+async def tx_packet_count(packet_count: int):
+    await tx_packet(str(packet_count))
 
 
-async def tx_packet(write_stream: StreamWriter, packet: str):
+async def tx_packet(packet: str):
     input("Press enter to transmit")
     print("transmitting")
-    encoded_packet = tx_encode(packet)
-    await tx_message(write_stream, "SHW,{},{}".format(tx_handle, encoded_packet))
+    encoded_packet = _tx_encode(packet)
+    await _tx_message("SHW,{},{}".format(TX_HANDLE, encoded_packet))
 
 
-async def tx_message(write_stream: StreamWriter, message: str, end_delimiter: str = '\n'):
+async def _tx_message(message: str, end_delimiter: str = '\n'):
     complete_message = message
     if end_delimiter is not None:
         complete_message += end_delimiter
@@ -134,10 +133,6 @@ async def tx_message(write_stream: StreamWriter, message: str, end_delimiter: st
     # repr -> replace special characters with escape sequences
 
 
-def tx_encode(payload: str) -> str:
+def _tx_encode(payload: str) -> str:
     # pack string to ASCII-encoded hex string
     return payload.encode('ascii').hex()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

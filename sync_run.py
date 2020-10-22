@@ -1,12 +1,19 @@
+from typing import List
+
 import runup1_pb2 as RunUp
 import rundown1_pb2 as RunDown
 import RN4870 as ble_module
 
 
 async def rx_run() -> RunDown.Run:
-
-
-
+    transfer_type = ble_module.TransferType.READ
+    await ble_module.open_connection(transfer_type)
+    packet_count = await ble_module.rx_packet_count()
+    packets: List[str] = []
+    for i in range(packet_count):
+        received_packet = await ble_module.rx_packet()
+        packets.append(received_packet)
+    return deserialize_run(packets)
 
     # Await a complete run being sent
     # First flush the receive queue
@@ -20,19 +27,27 @@ async def rx_run() -> RunDown.Run:
     # *** format that Protobuf expects the data for deserializing.
     # *** might be worth a bit of googling or just wait and test
     # *** or ig maybe make a unit test with simulated MCP encoded data if ahead of schedule
-    pass
 
 
 async def tx_run(run: RunUp.Run) -> None:
+    transfer_type = ble_module.TransferType.WRITE
+    await ble_module.open_connection(transfer_type)
+    packets = serialize_run(run)
+    packet_count = len(packets)
+    await ble_module.tx_packet_count(packet_count)
+    for i in range(packet_count):
+        await ble_module.tx_packet(packets[i])
+
     # Take a Protobuf run object, serialize, chunk, and send
     # First message should be the number of following messages (i.e. num chunks)
     # Then chunks should follow in order
     # Chunks should be created according to a parametric packet length (tx_packet_size)
     # Obviously individual chunks will need to be MCP encoded
-    pass
 
-def serialize_run(runData) -> List[str]:
+
+def serialize_run(runData: RunUp.Run) -> List[str]:
     # TODO
+    tx_packet_size = ble_module.TX_PACKET_SIZE
     tx_sample_packet = str(tx_packet_size) + ''.join(
         ['a' for _ in range(tx_packet_size - len(str(tx_packet_size)) * 2)]) + \
                        str(tx_packet_size)
@@ -41,12 +56,6 @@ def serialize_run(runData) -> List[str]:
     return packets
 
 
-def deserialize_run():
+def deserialize_run(packets: List[str]) -> RunDown.Run:
     # TODO
     pass
-
-# # intended use
-# runD = await rx_run()
-#
-# runU = RunUp.Run() # would be some args in there to set values
-# await tx_run(runU)

@@ -1,6 +1,5 @@
 import asyncio
 import serial_asyncio
-from enum import Enum
 
 StreamReader = asyncio.StreamReader
 StreamWriter = asyncio.StreamWriter
@@ -19,21 +18,22 @@ read_stream: StreamReader
 write_stream: StreamWriter
 
 
-class TransferType(Enum):
-    READ = 0
-    WRITE = 1
-
-
 # ***** ESTABLISH CONNECTION *****
-
-async def open_connection(transfer_type: TransferType):
+async def open_connection():
     global read_stream, write_stream
     read_stream, write_stream = await serial_asyncio.open_serial_connection(url=URL, baudrate=BAUDRATE, rtscts=RTSCTS)
     print("serial streams created\n")
     assert await _handshake()
     print("\tconnected")
-    if transfer_type == TransferType.WRITE:
-        assert await _rx_client_is_notifiable()
+
+
+def is_connected() -> bool:
+    try:
+        read_stream
+    except NameError:
+        return False
+    else:
+        return True
 
 
 async def _handshake() -> bool:
@@ -60,13 +60,15 @@ async def _reboot():
     assert await _rx_message(begin_delimiter='', end_delimiter='>') == "CMD"
 
 
-async def close_connection(transfer_type: TransferType):
-    if transfer_type == TransferType.WRITE:
-        write_stream.close()
-        await write_stream.wait_closed()
+async def close_connection():
+    write_stream.close()
+    await write_stream.wait_closed()
 
 
 # ***** RECEIVE DATA *****
+async def flush_read_stream():
+    await read_stream.read()
+
 
 async def rx_packet_count() -> int:
     # Assumes this is called before starting to receive all packets
@@ -74,7 +76,7 @@ async def rx_packet_count() -> int:
     return int(payload)
 
 
-async def _rx_client_is_notifiable() -> bool:
+async def rx_client_is_notifiable() -> bool:
     # Assumes already in transmit mode
     print("tx mode")
     print("waiting for subscribe to indicate")
@@ -87,10 +89,9 @@ async def rx_packet() -> (str, bytes):
     assert res.startswith("WV")
     handle = res.split(',')[1]
     payload = res.split(',')[-1]
-    decoded_handle = _rx_decode(handle).decode("ascii")
     decoded_payload = _rx_decode(payload)
     print("rx payload (length {}): {}".format(len(payload), decoded_payload))
-    return decoded_handle, decoded_payload
+    return handle, decoded_payload
 
 
 async def _rx_message(begin_delimiter: str = '%', end_delimiter: str = '%') -> str:
@@ -111,6 +112,9 @@ def _rx_decode(message: str) -> bytes:
 
 
 # ***** TRANSMIT DATA *****
+async def flush_write_stream():
+    await write_stream.drain()
+
 
 async def tx_packet_count(packet_count: int):
     packet_count_string = str(packet_count)
@@ -131,7 +135,7 @@ async def _tx_message(message: str, end_delimiter: str = '\n'):
         complete_message += end_delimiter
     write_stream.write(complete_message.encode('ascii'))
     print("tx draining...")
-    await write_stream.drain()
+    await flush_write_stream()
     print("\ttx drained: <{}>".format(repr(message + end_delimiter)))
     # repr -> replace special characters with escape sequences
 

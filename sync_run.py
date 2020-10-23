@@ -4,7 +4,6 @@ from runup1_pb2 import UploadedRun
 from rundown1_pb2 import DownloadedRun
 import RN4870 as ble_module
 import math
-import google.protobuf as protobuf
 
 
 async def rx_run() -> DownloadedRun:
@@ -61,11 +60,3 @@ def deserialize_run(packets: List[bytes]) -> DownloadedRun:
     parsed_run: DownloadedRun = DownloadedRun()
     parsed_run.ParseFromString(combined_packet)
     return parsed_run
-
-
-if __name__ == "__main__":
-    print("hello!!!!")
-    run: UploadedRun = UploadedRun()
-    run.totalDistance = 10
-    data = serialize_run(run)
-    deserialize_run(data)

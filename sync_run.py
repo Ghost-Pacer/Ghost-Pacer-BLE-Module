@@ -1,12 +1,13 @@
 from typing import List
 
-import runup1_pb2 as run_up
-import rundown1_pb2 as run_down
+from runup1_pb2 import UploadedRun
+from rundown1_pb2 import DownloadedRun
 import RN4870 as ble_module
+import math
 import google.protobuf as protobuf
 
 
-async def rx_run() -> run_down.DownloadedRun:
+async def rx_run() -> DownloadedRun:
     if not ble_module.is_connected():
         print("ERROR: Tried reading without active connection")
         return
@@ -20,7 +21,7 @@ async def rx_run() -> run_down.DownloadedRun:
     return deserialize_run(packets)
 
 
-async def tx_run(run: run_up.UploadedRun):
+async def tx_run(run: UploadedRun):
     if not ble_module.is_connected():
         print("ERROR: Tried writing without active connection")
         return
@@ -34,23 +35,37 @@ async def tx_run(run: run_up.UploadedRun):
         await ble_module.tx_packet(packets[i])
 
 
-def serialize_run(run_data: run_up.UploadedRun) -> List[bytes]:
-    # TODO
+def serialize_run(run: UploadedRun) -> List[bytes]:
+    run_data: bytearray = run.SerializeToString()
+    run_data_size = len(run_data)
+    print(run_data)
+    print(run_data[0].to_bytes(1, "little"))
+
     tx_packet_size = ble_module.TX_PACKET_SIZE
-    tx_sample_packet = str(tx_packet_size) + ''.join(
-        ['a' for _ in range(tx_packet_size - len(str(tx_packet_size)) * 2)]) + \
-                       str(tx_packet_size)
-    assert len(tx_sample_packet) == tx_packet_size
-    packets = [bytes.fromhex(tx_sample_packet)]
-    return packets
+    chunked_run_data: List[bytes] = []
+    for i in range(math.ceil(run_data_size / tx_packet_size)):
+        chunk: bytearray = bytearray()
+        for j in range(tx_packet_size):
+            index = i * j + j
+            if index >= run_data_size:
+                break
+            chunk.extend(run_data[index].to_bytes(1, "little"))
+        chunked_run_data.append(bytes(chunk))
+    return chunked_run_data
 
 
-def deserialize_run(packets: List[bytes]) -> run_down.DownloadedRun:
-    # TODO
-    test: str = "Test string of bytes"
-    return None
+def deserialize_run(packets: List[bytes]) -> DownloadedRun:
+    combined_packet: bytearray = bytearray()
+    for i in range(len(packets)):
+        combined_packet.extend(packets[i])
+    parsed_run: DownloadedRun = DownloadedRun()
+    parsed_run.ParseFromString(combined_packet)
+    return parsed_run
 
 
 if __name__ == "__main__":
     print("hello!!!!")
-
+    run: UploadedRun = UploadedRun()
+    run.totalDistance = 10
+    data = serialize_run(run)
+    deserialize_run(data)

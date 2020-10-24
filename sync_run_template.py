@@ -90,5 +90,3 @@ threading.Thread(target=watch_thread).start()
 while True:
     time.sleep(1)
     print(Watch.lat, Watch.lon, Watch.speed)
-
-

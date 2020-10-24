@@ -66,4 +66,5 @@ def watch_thread():
 
 
 if __name__ == "__main__":
+    ble_module.open_connection()
     main()

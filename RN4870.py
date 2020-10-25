@@ -14,8 +14,8 @@ TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
 RX_HANDLE = '0095'
 TX_HANDLE = '0092'
 
-read_stream
-write_stream
+read_stream = None
+write_stream = None
 
 
 # ***** ESTABLISH CONNECTION *****
@@ -28,12 +28,7 @@ async def open_connection():
 
 
 def is_connected() -> bool:
-    try:
-        read_stream
-    except NameError:
-        return False
-    else:
-        return True
+    return False if read_stream is None else True
 
 
 async def _handshake() -> bool:

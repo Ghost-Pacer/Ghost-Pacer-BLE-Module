@@ -67,4 +67,8 @@ def watch_thread():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main_loop = asyncio.get_event_loop()
+    try:
+        main_loop.run_until_complete(main())
+    finally:
+        main_loop.close()

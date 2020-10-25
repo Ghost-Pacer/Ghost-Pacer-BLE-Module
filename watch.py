@@ -21,7 +21,8 @@ Watch = WatchData(0.0, 0.0, 0.0, 0.0, 0.0)
 counter = 1
 
 
-def main():
+async def main():
+    await ble_module.open_connection()
     print("hi")
     threading.Thread(target=watch_thread).start()
 
@@ -66,5 +67,4 @@ def watch_thread():
 
 
 if __name__ == "__main__":
-    ble_module.open_connection()
-    main()
+    asyncio.run(main())

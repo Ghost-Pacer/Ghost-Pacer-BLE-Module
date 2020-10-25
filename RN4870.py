@@ -14,8 +14,8 @@ TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
 RX_HANDLE = '0095'
 TX_HANDLE = '0092'
 
-read_stream: StreamReader
-write_stream: StreamWriter
+read_stream
+write_stream
 
 
 # ***** ESTABLISH CONNECTION *****

@@ -17,7 +17,7 @@ handle_table = {
 WatchData = namedtuple('WatchData', "lat lon elev speed heart_rate")
 
 # global variable to make access similar to threaded AGPS3 implemetation
-Watch: WatchData = WatchData(0.0, 0.0, 0.0, 0.0, 0.0)
+Watch = WatchData(0.0, 0.0, 0.0, 0.0, 0.0)
 counter = 1
 
 

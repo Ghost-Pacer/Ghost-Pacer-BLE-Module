@@ -7,11 +7,11 @@ import time
 import RN4870 as ble_module
 
 handle_table = {
-    '0073': 'lat',
-    '0075': 'lon',
-    '0077': 'elev',
-    '0079': 'speed',
-    '0081': 'heart_rate'
+    '0074': 'lat',
+    '0076': 'lon',
+    '007A': 'elev',
+    '0078': 'speed',
+    '0072': 'heart_rate'
 }
 
 WatchData = namedtuple('WatchData', "lat lon elev speed heart_rate")
@@ -50,11 +50,11 @@ def watch_thread():
 
     # keys in current_data are RN4871 handles, exact values TBD
     current_data = {
-        '0073': 0.0,  # lat
-        '0075': 0.0,  # lon
-        '0077': 0.0,  # elev
-        '0079': 0.0,  # speed
-        '0081': 0.0  # heart rate
+        '0074': 0.0,
+        '0076': 0.0,
+        '007A': 0.0,
+        '0078': 0.0,
+        '0072': 0.0
     }
 
     while True:

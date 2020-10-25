@@ -47,8 +47,8 @@ async def _reboot():
     except asyncio.TimeoutError:
         # nothing back, so already in command mode
         # send newline to clear, will error out
-        await _tx_message("")
-        assert "Err" in await _rx_message(begin_delimiter='', end_delimiter='>')
+        #await _tx_message("")
+        #assert "Err" in await _rx_message(begin_delimiter='', end_delimiter='>')
     await _tx_message("R,1")
     assert await _rx_message() == "REBOOT"
     await _tx_message("$$$", end_delimiter='')

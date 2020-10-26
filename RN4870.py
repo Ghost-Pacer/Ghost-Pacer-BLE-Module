@@ -4,7 +4,7 @@ import serial_asyncio
 StreamReader = asyncio.StreamReader
 StreamWriter = asyncio.StreamWriter
 
-URL = '/dev/ttyO4'
+URL = '/dev/ttyS1'
 BAUDRATE = 115200
 RTSCTS = False
 

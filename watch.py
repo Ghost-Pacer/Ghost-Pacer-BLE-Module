@@ -7,11 +7,11 @@ import time
 import RN4870 as ble_module
 
 handle_table = {
-    '0074': 'lat',
-    '0076': 'lon',
-    '007A': 'elev',
-    '0078': 'speed',
-    '0072': 'heart_rate'
+    '0094': 'lat',
+    '0096': 'lon',
+    '009A': 'elev',
+    '0098': 'speed',
+    '0092': 'heart_rate'
 }
 
 WatchData = namedtuple('WatchData', "lat lon elev speed heart_rate")
@@ -34,10 +34,11 @@ async def main():
 
 
 async def watch_update() -> typing.Tuple[str, float]:
-    #handle: str = "0073"
-    #numeric_value: float = 1.0
-    handle, packet = await ble_module.rx_packet()
-    numeric_value = float(packet.decode("ascii"))
+    handle = "0094"
+    numeric_value = 1.0
+    #handle, packet = await ble_module.rx_packet()
+    #numeric_value = float(packet.decode("ascii"))
+    await asyncio.sleep(1)
     return handle, numeric_value
 
 
@@ -50,11 +51,11 @@ def watch_thread():
 
     # keys in current_data are RN4871 handles, exact values TBD
     current_data = {
-        '0074': 0.0,
-        '0076': 0.0,
-        '007A': 0.0,
-        '0078': 0.0,
-        '0072': 0.0
+        '0094': 0.0,
+        '0096': 0.0,
+        '009A': 0.0,
+        '0098': 0.0,
+        '0092': 0.0
     }
 
     while True:

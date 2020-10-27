@@ -64,11 +64,11 @@ WatchData = namedtuple('WatchData', "lat lon elev speed heart_rate")
 # PyCharm (and maybe other IDEs?) doesn't properly handle a namedtuple constructed from potentially dynamic data
 # to fix syntax highlighting replace handle_table.values() with "lat lon elev speed heart_rate"
 
-Watch: WatchData = WatchData(0.0, 0.0, 0.0, 0.0, 0.0)
+watch_data: WatchData = WatchData(0.0, 0.0, 0.0, 0.0, 0.0)
 # global variable to make access similar to threaded AGPS3 implemetation
 
 def watch_thread():
-    global Watch
+    global watch_data
 
     # keys in current_data are RN4871 handles, exact values TBD
     current_data = {
@@ -89,4 +89,4 @@ def watch_thread():
 threading.Thread(target=watch_thread).start()
 while True:
     time.sleep(1)
-    print(Watch.lat, Watch.lon, Watch.speed)
+    print(watch_data.lat, watch_data.lon, watch_data.speed)

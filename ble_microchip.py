@@ -11,9 +11,6 @@ RTSCTS = False
 RX_PACKET_SIZE = 100  # arbitrary limit imposed by MCP, test with 1.30 firmware?
 TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
 
-RX_HANDLE = '0095'
-TX_HANDLE = '0092'
-
 read_stream = None
 write_stream = None
 
@@ -33,7 +30,7 @@ def is_connected() -> bool:
 
 async def _handshake() -> bool:
     await _reboot()
-    print("waiting for connect")
+    print("Waiting for connect...")
     return (await _rx_message()).startswith("CONNECT,1")
 
 

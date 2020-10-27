@@ -23,12 +23,15 @@ counter = 0
 
 
 async def main():
-    #await ble_module.open_connection()
+    await ble_module.open_connection()
     print("Watch code starts...")
-    threading.Thread(target=watch_thread).start()
+
+    main_loop = asyncio.get_event_loop()
+    main_loop.create_task(watch_thread())
 
     global counter
     while True:
+        await asyncio.sleep(0)
         time.sleep(1)
         print(Watch.lat, Watch.lon, Watch.speed)
         print("Total packets received: " + str(counter))
@@ -42,15 +45,9 @@ async def watch_update() -> typing.Tuple[str, float]:
     return handle, numeric_value
 
 
-def watch_thread():
+async def watch_thread():
     global Watch
     global counter
-
-    watch_thread_loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(watch_thread_loop)
-
-    open_connection_task = watch_thread_loop.create_task(ble_module.open_connection())
-    watch_thread_loop.run_until_complete(open_connection_task)
 
     # keys in current_data are RN4871 handles, exact values TBD
     current_data = {
@@ -62,9 +59,7 @@ def watch_thread():
     }
 
     while True:
-        task = watch_thread_loop.create_task(watch_update())
-        watch_thread_loop.run_until_complete(task)
-        handle, value = task.result()
+        handle, value = await watch_update()
         current_data[handle] = value
         Watch = WatchData(**{handle_table[handle]: current_data[handle] for handle in current_data.keys()})
         counter += 1

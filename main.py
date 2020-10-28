@@ -14,8 +14,16 @@ async def main():
 
     while True:
         await asyncio.sleep(1)
-        print(watch.watch_data.latitude, watch.watch_data.longitude, watch.watch_data.speed)
+        watch_data = watch.watch_data
+        print("Latitude: " + str(watch_data.latitude))
+        print("Longitude: " + str(watch_data.longitude))
+        print("Altitude: " + str(watch_data.altitude))
+        print("Speed: " + str(watch_data.speed))
+        print("Heart Rate: " + str(watch_data.heart_rate))
         print("Total packets received: " + str(watch.packets_received))
+        print("**********")
+        print()
+
 
 
 if __name__ == "__main__":

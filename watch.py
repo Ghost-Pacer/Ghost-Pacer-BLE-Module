@@ -33,16 +33,22 @@ async def fetch_watch_data():
 
     while True:
         handle, value = await _rx_watch_data_packet()
+        if not handle: continue
+
         current_data[handle] = value
         watch_data = WatchData(**{_handle_table[handle]: current_data[handle] for handle in current_data.keys()})
         packets_received += 1
 
 
-async def _rx_watch_data_packet() -> typing.Tuple[str, float]:
+async def _rx_watch_data_packet() -> (str, float):
     handle, packet = await ble_microchip.rx_packet()
     numeric_value = float(int.from_bytes(packet, byteorder="little", signed=True))
 
-    if _handle_table[handle] is not "heart_rate":
-        numeric_value = numeric_value / 1000000
+    try:
+        data_type = _handle_table[handle]
+        if data_type is not "heart_rate":
+            numeric_value = numeric_value / 1000000
+    except:
+        return ("", 0)
 
     return handle, numeric_value

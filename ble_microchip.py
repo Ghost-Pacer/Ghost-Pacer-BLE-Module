@@ -79,7 +79,8 @@ async def rx_client_is_notifiable() -> bool:
 async def rx_packet() -> (str, bytes):
     if _DEBUG: print("rx mode, awaiting data")
     res = await _rx_message()
-    assert res.startswith("WV")
+    if not res.startswith("WV"): return ("", int(0).to_bytes(1, "little"))
+
     handle = res.split(',')[1]
     payload = res.split(',')[-1]
     decoded_payload = _rx_decode(payload)

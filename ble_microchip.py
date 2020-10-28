@@ -4,31 +4,29 @@ import serial_asyncio
 StreamReader = asyncio.StreamReader
 StreamWriter = asyncio.StreamWriter
 
-URL = '/dev/ttyS1'
-BAUDRATE = 115200
-RTSCTS = False
+_URL = '/dev/ttyS1'
+_BAUDRATE = 115200
+_RTSCTS = False
 
-RX_PACKET_SIZE = 100  # arbitrary limit imposed by MCP, test with 1.30 firmware?
 TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
+_TX_HANDLE = '0092'
 
-read_stream = None
-write_stream = None
+_read_stream = None
+_write_stream = None
 
 
 # ***** ESTABLISH CONNECTION *****
 async def open_connection():
-    global read_stream, write_stream
-    read_stream, write_stream = await serial_asyncio.open_serial_connection(url=URL, baudrate=BAUDRATE, rtscts=RTSCTS)
+    global _read_stream, _write_stream
+    _read_stream, _write_stream = await serial_asyncio.open_serial_connection(url=_URL, baudrate=_BAUDRATE, rtscts=_RTSCTS)
     print("serial streams created\n")
-    assert await _handshake()
-    print("\tconnected")
 
 
 def is_connected() -> bool:
-    return False if read_stream is None else True
+    return False if _read_stream is None else True
 
 
-async def _handshake() -> bool:
+async def handshake() -> bool:
     await _reboot()
     print("Waiting for connect...")
     return (await _rx_message()).startswith("CONNECT,1")
@@ -54,13 +52,13 @@ async def _reboot():
 
 
 async def close_connection():
-    write_stream.close()
-    await write_stream.wait_closed()
+    _write_stream.close()
+    await _write_stream.wait_closed()
 
 
 # ***** RECEIVE DATA *****
 async def flush_read_stream():
-    await read_stream.read()
+    await _read_stream.read()
 
 
 async def rx_packet_count() -> int:
@@ -90,10 +88,10 @@ async def rx_packet() -> (str, bytes):
 async def _rx_message(begin_delimiter: str = '%', end_delimiter: str = '%') -> str:
     if begin_delimiter:
         print("rx awaiting begin delimiter...")
-        raw_delim = await read_stream.readuntil(begin_delimiter.encode('ascii'))
+        raw_delim = await _read_stream.readuntil(begin_delimiter.encode('ascii'))
         print("\trx consumed: {}".format(repr(raw_delim.decode('ascii'))))
     print("rx awaiting content...")
-    raw_message = await read_stream.readuntil(end_delimiter.encode('ascii'))
+    raw_message = await _read_stream.readuntil(end_delimiter.encode('ascii'))
     # convert bytestream to console text/utf-8 and strip trailing '%'
     message = raw_message.decode('ascii')[:-len(end_delimiter)]
     print("\trx consumed: {}".format(repr(raw_message.decode('ascii'))))
@@ -106,7 +104,7 @@ def _rx_decode(message: str) -> bytes:
 
 # ***** TRANSMIT DATA *****
 async def flush_write_stream():
-    await write_stream.drain()
+    await _write_stream.drain()
 
 
 async def tx_packet_count(packet_count: int):
@@ -119,14 +117,14 @@ async def tx_packet(packet: bytes):
     input("Press enter to transmit")
     print("transmitting")
     encoded_packet = _tx_encode(packet)
-    await _tx_message("SHW,{},{}".format(TX_HANDLE, encoded_packet))
+    await _tx_message("SHW,{},{}".format(_TX_HANDLE, encoded_packet))
 
 
 async def _tx_message(message: str, end_delimiter: str = '\n'):
     complete_message = message
     if end_delimiter is not None:
         complete_message += end_delimiter
-    write_stream.write(complete_message.encode('ascii'))
+    _write_stream.write(complete_message.encode('ascii'))
     print("tx draining...")
     await flush_write_stream()
     print("\ttx drained: <{}>".format(repr(message + end_delimiter)))

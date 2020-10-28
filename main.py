@@ -6,6 +6,7 @@ import ble_microchip
 
 async def main():
     await ble_microchip.open_connection()
+    await ble_microchip.handshake()
     print("Began fetching watch data...")
 
     main_loop = asyncio.get_event_loop()

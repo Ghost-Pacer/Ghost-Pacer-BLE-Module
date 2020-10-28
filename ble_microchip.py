@@ -11,7 +11,7 @@ _RTSCTS = False
 TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
 _TX_HANDLE = '0092'
 
-_DEBUG = False
+_DEBUG = True
 
 _read_stream = None
 _write_stream = None
@@ -60,6 +60,7 @@ async def close_connection():
 
 # ***** RECEIVE DATA *****
 async def flush_read_stream():
+    _read_stream.feed_eof()
     await _read_stream.read()
 
 

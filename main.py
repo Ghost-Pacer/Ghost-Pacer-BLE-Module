@@ -2,9 +2,22 @@ import asyncio
 import time
 
 import watch
+import sync_run
 import ble_microchip
 
 async def main():
+    await phone_test()
+
+
+async def phone_test():
+    await ble_microchip.open_connection()
+    await ble_microchip.handshake()
+    print("Began fetching phone data...")
+    run = await sync_run.rx_run()
+    print(run)
+
+
+async def watch_test():
     await ble_microchip.open_connection()
     await ble_microchip.handshake()
     print("Began fetching watch data...")
@@ -23,7 +36,6 @@ async def main():
         print("Total packets received: " + str(watch.packets_received))
         print("**********")
         print()
-
 
 
 if __name__ == "__main__":

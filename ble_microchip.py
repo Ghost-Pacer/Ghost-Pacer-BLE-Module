@@ -11,6 +11,8 @@ _RTSCTS = False
 TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
 _TX_HANDLE = '0092'
 
+_DEBUG = False
+
 _read_stream = None
 _write_stream = None
 
@@ -19,7 +21,7 @@ _write_stream = None
 async def open_connection():
     global _read_stream, _write_stream
     _read_stream, _write_stream = await serial_asyncio.open_serial_connection(url=_URL, baudrate=_BAUDRATE, rtscts=_RTSCTS)
-    print("serial streams created\n")
+    if _DEBUG: print("serial streams created\n")
 
 
 def is_connected() -> bool:
@@ -34,7 +36,7 @@ async def handshake() -> bool:
 
 async def _reboot():
     # assume not in command mode
-    print("rebooting")
+    if _DEBUG: print("rebooting")
     await _tx_message("$$$", end_delimiter='')
     try:
         # wait up to 1 sec for CMD>
@@ -69,32 +71,32 @@ async def rx_packet_count() -> int:
 
 async def rx_client_is_notifiable() -> bool:
     # Assumes already in transmit mode
-    print("tx mode")
-    print("waiting for subscribe to indicate")
+    if _DEBUG: print("tx mode")
+    if _DEBUG: print("waiting for subscribe to indicate")
     return (await _rx_message()).startswith("WC")
 
 
 async def rx_packet() -> (str, bytes):
-    print("rx mode, awaiting data")
+    if _DEBUG: print("rx mode, awaiting data")
     res = await _rx_message()
     assert res.startswith("WV")
     handle = res.split(',')[1]
     payload = res.split(',')[-1]
     decoded_payload = _rx_decode(payload)
-    print("rx payload (length {}): {}".format(len(payload), decoded_payload))
+    if _DEBUG: print("rx payload (length {}): {}".format(len(payload), decoded_payload))
     return handle, decoded_payload
 
 
 async def _rx_message(begin_delimiter: str = '%', end_delimiter: str = '%') -> str:
     if begin_delimiter:
-        print("rx awaiting begin delimiter...")
+        if _DEBUG: print("rx awaiting begin delimiter...")
         raw_delim = await _read_stream.readuntil(begin_delimiter.encode('ascii'))
-        print("\trx consumed: {}".format(repr(raw_delim.decode('ascii'))))
-    print("rx awaiting content...")
+        if _DEBUG: print("\trx consumed: {}".format(repr(raw_delim.decode('ascii'))))
+    if _DEBUG: print("rx awaiting content...")
     raw_message = await _read_stream.readuntil(end_delimiter.encode('ascii'))
     # convert bytestream to console text/utf-8 and strip trailing '%'
     message = raw_message.decode('ascii')[:-len(end_delimiter)]
-    print("\trx consumed: {}".format(repr(raw_message.decode('ascii'))))
+    if _DEBUG: print("\trx consumed: {}".format(repr(raw_message.decode('ascii'))))
     return message
 
 
@@ -114,8 +116,8 @@ async def tx_packet_count(packet_count: int):
 
 
 async def tx_packet(packet: bytes):
-    input("Press enter to transmit")
-    print("transmitting")
+    if _DEBUG: input("Press enter to transmit")
+    if _DEBUG: print("transmitting")
     encoded_packet = _tx_encode(packet)
     await _tx_message("SHW,{},{}".format(_TX_HANDLE, encoded_packet))
 
@@ -125,9 +127,9 @@ async def _tx_message(message: str, end_delimiter: str = '\n'):
     if end_delimiter is not None:
         complete_message += end_delimiter
     _write_stream.write(complete_message.encode('ascii'))
-    print("tx draining...")
+    if _DEBUG: print("tx draining...")
     await flush_write_stream()
-    print("\ttx drained: <{}>".format(repr(message + end_delimiter)))
+    if _DEBUG: print("\ttx drained: <{}>".format(repr(message + end_delimiter)))
     # repr -> replace special characters with escape sequences
 
 

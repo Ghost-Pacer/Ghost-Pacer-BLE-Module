@@ -13,8 +13,7 @@ async def main():
     main_loop.create_task(watch.fetch_watch_data())
 
     while True:
-        await asyncio.sleep(0)
-        time.sleep(1)
+        await asyncio.sleep(1)
         print(watch.watch_data.latitude, watch.watch_data.longitude, watch.watch_data.speed)
         print("Total packets received: " + str(watch.packets_received))
 

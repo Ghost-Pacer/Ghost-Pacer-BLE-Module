@@ -8,18 +8,19 @@ from runup1_pb2 import UploadedRun
 
 
 async def main():
-    await phone_upload_test()
+    await download_from_phone_test()
 
 
-async def phone_download_test():
+async def download_from_phone_test():
     await ble_microchip.open_connection()
+    await ble_microchip.flush_read_stream()
     await ble_microchip.connect_to_device()
     print("Began fetching phone data...")
     run = await sync_run.download_run()
     print(run)
 
 
-async def phone_upload_test():
+async def upload_to_phone_test():
     await ble_microchip.open_connection()
     await ble_microchip.connect_to_device()
 

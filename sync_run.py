@@ -27,7 +27,7 @@ async def tx_run(run: UploadedRun):
         print("ERROR: Tried writing without active connection")
         return
 
-    assert await ble_microchip.rx_client_is_notifiable()
+    assert await ble_microchip.device_is_notifiable()
     packets = serialize_run(run)
     packet_count = len(packets)
     await ble_microchip.tx_packet_count(packet_count)

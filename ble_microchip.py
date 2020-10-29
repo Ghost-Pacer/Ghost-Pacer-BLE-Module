@@ -20,18 +20,31 @@ _write_stream = None
 # ***** ESTABLISH CONNECTION *****
 async def open_connection():
     global _read_stream, _write_stream
-    _read_stream, _write_stream = await serial_asyncio.open_serial_connection(url=_URL, baudrate=_BAUDRATE, rtscts=_RTSCTS)
+    _read_stream, _write_stream = await serial_asyncio.open_serial_connection(url=_URL, baudrate=_BAUDRATE,
+                                                                              rtscts=_RTSCTS)
     if _DEBUG: print("serial streams created\n")
+    await _reboot()
 
 
 def is_connected() -> bool:
     return False if _read_stream is None else True
 
 
-async def handshake() -> bool:
-    await _reboot()
+async def connect_to_device() -> bool:
     print("Waiting for connect...")
     return (await _rx_message()).startswith("CONNECT,1")
+
+
+async def device_is_notifiable() -> bool:
+    # Assumes already in transmit mode
+    if _DEBUG: print("tx mode")
+    if _DEBUG: print("waiting for subscribe to indicate")
+    return (await _rx_message()).startswith("WC")
+
+
+async def close_connection():
+    _write_stream.close()
+    await _write_stream.wait_closed()
 
 
 async def _reboot():
@@ -53,11 +66,6 @@ async def _reboot():
     assert await _rx_message(begin_delimiter='', end_delimiter='>') == "CMD"
 
 
-async def close_connection():
-    _write_stream.close()
-    await _write_stream.wait_closed()
-
-
 # ***** RECEIVE DATA *****
 async def flush_read_stream():
     _read_stream.feed_eof()
@@ -70,17 +78,10 @@ async def rx_packet_count() -> int:
     return int.from_bytes(payload, byteorder="little", signed=True)
 
 
-async def rx_client_is_notifiable() -> bool:
-    # Assumes already in transmit mode
-    if _DEBUG: print("tx mode")
-    if _DEBUG: print("waiting for subscribe to indicate")
-    return (await _rx_message()).startswith("WC")
-
-
 async def rx_packet() -> (str, bytes):
     if _DEBUG: print("rx mode, awaiting data")
     res = await _rx_message()
-    if not res.startswith("WV"): return ("", int(0).to_bytes(1, "little"))
+    if not res.startswith("WV"): return "", int(0).to_bytes(1, "little")
 
     handle = res.split(',')[1]
     payload = res.split(',')[-1]

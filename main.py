@@ -6,22 +6,22 @@ import ble_microchip
 from rundown1_pb2 import DownloadedRun
 from runup1_pb2 import UploadedRun
 
+
 async def main():
     await phone_upload_test()
 
 
 async def phone_download_test():
     await ble_microchip.open_connection()
-    await ble_microchip.handshake()
+    await ble_microchip.connect_to_device()
     print("Began fetching phone data...")
     run = await sync_run.rx_run()
     print(run)
-    return run
 
 
 async def phone_upload_test():
     await ble_microchip.open_connection()
-    await ble_microchip.handshake()
+    await ble_microchip.connect_to_device()
 
     file = open("./downloaded_run.txt", "rb")
     serialized_run = file.read()
@@ -36,7 +36,7 @@ async def phone_upload_test():
 
 async def watch_test():
     await ble_microchip.open_connection()
-    await ble_microchip.handshake()
+    await ble_microchip.connect_to_device()
     print("Began fetching watch data...")
 
     main_loop = asyncio.get_event_loop()

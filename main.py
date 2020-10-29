@@ -1,20 +1,37 @@
 import asyncio
-import time
 
 import watch
 import sync_run
 import ble_microchip
+from rundown1_pb2 import DownloadedRun
+from runup1_pb2 import UploadedRun
 
 async def main():
-    await phone_test()
+    await phone_upload_test()
 
 
-async def phone_test():
+async def phone_download_test():
     await ble_microchip.open_connection()
     await ble_microchip.handshake()
     print("Began fetching phone data...")
     run = await sync_run.rx_run()
     print(run)
+    return run
+
+
+async def phone_upload_test():
+    await ble_microchip.open_connection()
+    await ble_microchip.handshake()
+
+    file = open("./downloaded_run.txt", "rb")
+    serialized_run = file.read()
+    file.close()
+
+    run = DownloadedRun()
+    run.ParseFromString(serialized_run)
+
+    await sync_run.tx_run(run)
+    print("Finished transmitting data.")
 
 
 async def watch_test():

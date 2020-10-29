@@ -1,3 +1,16 @@
+"""Facilitates transferring data to and from the RN4871 BLE microchip
+
+Functions provided allow connecting to another device over BLE and sending/receiving data. open_connection() should
+only be called once per session. device_is_notifiable() only needs to be called when sending data.
+
+    Typical example usage:
+
+    await open_connection()
+    await connect_to_device()
+    handle, payload = rx_packet()
+    ... do stuff with received data ...
+"""
+
 import asyncio
 import serial_asyncio
 
@@ -40,11 +53,6 @@ async def device_is_notifiable() -> bool:
     if _DEBUG: print("tx mode")
     if _DEBUG: print("waiting for subscribe to indicate")
     return (await _rx_message()).startswith("WC")
-
-
-async def close_connection():
-    _write_stream.close()
-    await _write_stream.wait_closed()
 
 
 async def _reboot():

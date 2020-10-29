@@ -15,7 +15,7 @@ async def phone_download_test():
     await ble_microchip.open_connection()
     await ble_microchip.connect_to_device()
     print("Began fetching phone data...")
-    run = await sync_run.rx_run()
+    run = await sync_run.download_run()
     print(run)
 
 
@@ -30,7 +30,7 @@ async def phone_upload_test():
     run = DownloadedRun()
     run.ParseFromString(serialized_run)
 
-    await sync_run.tx_run(run)
+    await sync_run.upload_run(run)
     print("Finished transmitting data.")
 
 

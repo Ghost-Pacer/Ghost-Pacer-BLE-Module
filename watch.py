@@ -1,7 +1,23 @@
+"""Receive GPS and heart rate data from Apple Watch.
+
+The watch_data global variable holds the most recent data fetched from the apple watch. This module should be used
+with asyncio to receive data asynchronously. This module depends on the ble_microchip module, and assumes the client
+has already connected to the Apple Watch.
+
+    Typical usage example:
+
+    main_loop = asyncio.get_event_loop()
+    main_loop.create_task(fetch_watch_data())
+
+    while ...:
+        ... do unrelated tasks ...
+        await asyncio.sleep(0) # This is needed in busy waiting loops to process tasks in the event loop
+        latitude = watch.latitude
+        longitude = watch.longitude
+        ... do stuff with watch data ...
+"""
+
 from collections import namedtuple
-import typing
-import asyncio
-import time
 
 import ble_microchip
 
@@ -44,11 +60,11 @@ async def _rx_watch_data_packet() -> (str, float):
     handle, packet = await ble_microchip.rx_packet()
     numeric_value = float(int.from_bytes(packet, byteorder="little", signed=True))
 
-    try:
+    if handle in _handle_table:
         data_type = _handle_table[handle]
         if data_type is not "heart_rate":
             numeric_value = numeric_value / 1000000
-    except:
-        return ("", 0)
+    else:
+        return "", 0
 
     return handle, numeric_value

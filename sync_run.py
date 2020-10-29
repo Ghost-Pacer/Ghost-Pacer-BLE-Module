@@ -1,3 +1,16 @@
+"""Upload/download run data to and from the Ghost Pacer iOS app
+
+Download a run from the Ghost Pacer iOS app as a DownloadedRun protobuf object, or upload a UploadedRun protobuf
+object to the app. You can only use this module if you've already opened a connection to a device with the
+ble_microchip module.
+
+    Typical usage example:
+    downloaded_run = await download_run()
+    ...
+    run_to_upload = UploadedRun(...)
+    await upload_run(run_to_upload)
+"""
+
 from typing import List
 
 from runup1_pb2 import UploadedRun
@@ -7,9 +20,9 @@ import asyncio
 import math
 
 
-async def rx_run() -> DownloadedRun:
+async def download_run() -> DownloadedRun:
     if not ble_microchip.is_connected():
-        print("ERROR: Tried reading without active connection")
+        print("Error: Tried reading without active connection")
         return
 
     packet_count = await ble_microchip.rx_packet_count()
@@ -19,16 +32,16 @@ async def rx_run() -> DownloadedRun:
         print("Packets received: " + str(i + 1) + "/" + str(packet_count))
         _, received_packet = await ble_microchip.rx_packet()
         packets.append(received_packet)
-    return deserialize_run(packets)
+    return _deserialize_run(packets)
 
 
-async def tx_run(run: UploadedRun):
+async def upload_run(run: UploadedRun):
     if not ble_microchip.is_connected():
-        print("ERROR: Tried writing without active connection")
+        print("Error: Tried writing without active connection")
         return
 
     assert await ble_microchip.device_is_notifiable()
-    packets = serialize_run(run)
+    packets = _serialize_run(run)
     packet_count = len(packets)
     await ble_microchip.tx_packet_count(packet_count)
     for i in range(packet_count):
@@ -36,7 +49,7 @@ async def tx_run(run: UploadedRun):
         await ble_microchip.tx_packet(packets[i])
 
 
-def serialize_run(run: UploadedRun) -> List[bytes]:
+def _serialize_run(run: UploadedRun) -> List[bytes]:
     run_data = run.SerializeToString()
     run_data_size = len(run_data)
 
@@ -50,7 +63,7 @@ def serialize_run(run: UploadedRun) -> List[bytes]:
     return chunked_run_data
 
 
-def deserialize_run(packets: List[bytes]) -> DownloadedRun:
+def _deserialize_run(packets: List[bytes]) -> DownloadedRun:
     combined_packet = bytearray()
     for i in range(len(packets)):
         combined_packet.extend(packets[i])

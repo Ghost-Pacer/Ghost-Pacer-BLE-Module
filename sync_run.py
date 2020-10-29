@@ -20,6 +20,7 @@ import asyncio
 import math
 
 
+# ***** DOWNLOAD/UPLOAD RUN *****
 async def download_run() -> DownloadedRun:
     if not ble_microchip.is_connected():
         print("Error: Tried reading without active connection")
@@ -49,6 +50,7 @@ async def upload_run(run: UploadedRun):
         await ble_microchip.tx_packet(packets[i])
 
 
+# ***** SERIALIZE/DESERIALIZE RUN *****
 def _serialize_run(run: UploadedRun) -> List[bytes]:
     run_data = run.SerializeToString()
     run_data_size = len(run_data)

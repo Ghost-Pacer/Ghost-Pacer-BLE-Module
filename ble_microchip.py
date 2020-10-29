@@ -9,9 +9,9 @@ _BAUDRATE = 115200
 _RTSCTS = False
 
 TX_PACKET_SIZE = 20  # arbitrary limit imposed by MCP
-_TX_HANDLE = '0092'
+_TX_HANDLE = '0072'
 
-_DEBUG = True
+_DEBUG = False
 
 _read_stream = None
 _write_stream = None

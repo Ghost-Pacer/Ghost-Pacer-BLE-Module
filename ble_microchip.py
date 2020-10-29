@@ -12,6 +12,7 @@ only be called once per session. device_is_notifiable() only needs to be called 
 """
 
 import asyncio
+from os import read
 import serial_asyncio
 
 StreamReader = asyncio.StreamReader
@@ -76,8 +77,9 @@ async def _reboot():
 
 # ***** RECEIVE DATA *****
 async def flush_read_stream():
-    _read_stream.feed_eof()
-    await _read_stream.read()
+    _read_stream.feed_data(b'END_OF_BUFFER')
+    await _read_stream.readuntil(b'END_OF_BUFFER')
+    
 
 
 async def rx_packet_count() -> int:

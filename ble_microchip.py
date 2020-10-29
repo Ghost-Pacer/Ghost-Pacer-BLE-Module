@@ -67,7 +67,7 @@ async def flush_read_stream():
 async def rx_packet_count() -> int:
     # Assumes this is called before starting to receive all packets
     _, payload = await rx_packet()
-    return int(payload)
+    return int.from_bytes(payload, byteorder="little", signed=True)
 
 
 async def rx_client_is_notifiable() -> bool:
@@ -112,13 +112,11 @@ async def flush_write_stream():
 
 
 async def tx_packet_count(packet_count: int):
-    packet_count_string = str(packet_count)
-    packet_count_bytes = bytes.fromhex(packet_count_string)
+    packet_count_bytes = packet_count.to_bytes((packet_count.bit_length() // 8) + 1, "little")
     await tx_packet(packet_count_bytes)
 
 
 async def tx_packet(packet: bytes):
-    if _DEBUG: input("Press enter to transmit")
     if _DEBUG: print("transmitting")
     encoded_packet = _tx_encode(packet)
     await _tx_message("SHW,{},{}".format(_TX_HANDLE, encoded_packet))

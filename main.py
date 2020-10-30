@@ -9,15 +9,18 @@ from runup1_pb2 import UploadedRun
 
 async def main():
     await upload_to_phone_test("./test_runs/uploaded_run.txt")
+    # await download_from_phone_test()
+    # await watch_test()
 
 
 async def download_from_phone_test():
     await ble_microchip.open_connection()
     await ble_microchip.flush_read_stream()
-    await ble_microchip.connect_to_device()
+    await ble_microchip.connect_device()
     print("Began fetching phone data...")
     run = await sync_run.download_run()
     print(run)
+    assert await ble_microchip.disconnect_device()
 
 
 async def upload_to_phone_test(file_path: str):
@@ -29,14 +32,15 @@ async def upload_to_phone_test(file_path: str):
     run.ParseFromString(serialized_run)
 
     await ble_microchip.open_connection()
-    await ble_microchip.connect_to_device()
+    assert await ble_microchip.connect_device()
     await sync_run.upload_run(run)
+    assert await ble_microchip.disconnect_device()
     print("Finished transmitting data.")
 
 
 async def watch_test():
     await ble_microchip.open_connection()
-    await ble_microchip.connect_to_device()
+    assert await ble_microchip.connect_device()
     print("Began fetching watch data...")
 
     main_loop = asyncio.get_event_loop()

@@ -45,9 +45,14 @@ def is_connected() -> bool:
     return False if _read_stream is None else True
 
 
-async def connect_to_device() -> bool:
+async def connect_device() -> bool:
     print("Waiting for connect...")
     return (await _rx_message()).startswith("CONNECT,1")
+
+
+async def disconnect_device() -> bool:
+    print("Disconnecting device...")
+    return (await _rx_message()).startswith("DISCONNECT")
 
 
 async def device_is_notifiable() -> bool:
@@ -80,9 +85,8 @@ async def _reboot():
 
 # ***** RECEIVE DATA *****
 async def flush_read_stream():
-    _read_stream.feed_data(b'END_OF_BUFFER')
-    await _read_stream.readuntil(b'END_OF_BUFFER')
-    
+    _read_stream.feed_data(b"END_OF_BUFFER")
+    await _read_stream.readuntil(b"END_OF_BUFFER")
 
 
 async def rx_packet_count() -> int:

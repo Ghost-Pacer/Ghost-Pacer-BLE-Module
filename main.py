@@ -8,7 +8,7 @@ from runup1_pb2 import UploadedRun
 
 
 async def main():
-    await upload_to_phone_test()
+    await upload_to_phone_test("./test_runs/uploaded_run.txt")
 
 
 async def download_from_phone_test():
@@ -20,7 +20,42 @@ async def download_from_phone_test():
     print(run)
 
 
-async def upload_to_phone_test():
+async def upload_to_phone_test(file_path: str):
+    file = open(file_path, "rb")
+    serialized_run = file.read()
+    file.close()
+
+    run = UploadedRun()
+    run.ParseFromString(serialized_run)
+
+    await ble_microchip.open_connection()
+    await ble_microchip.connect_to_device()
+    await sync_run.upload_run(run)
+    print("Finished transmitting data.")
+
+
+async def watch_test():
+    await ble_microchip.open_connection()
+    await ble_microchip.connect_to_device()
+    print("Began fetching watch data...")
+
+    main_loop = asyncio.get_event_loop()
+    main_loop.create_task(watch.fetch_watch_data())
+
+    while True:
+        await asyncio.sleep(1)
+        watch_data = watch.watch_data
+        print("Latitude: " + str(watch_data.latitude))
+        print("Longitude: " + str(watch_data.longitude))
+        print("Altitude: " + str(watch_data.altitude))
+        print("Speed: " + str(watch_data.speed))
+        print("Heart Rate: " + str(watch_data.heart_rate))
+        print("Total packets received: " + str(watch.packets_received))
+        print("**********")
+        print()
+
+
+async def export_protobuf(file_path: str):
     total_distance = 413.0295132011648
     start_time = 1602977525.2487347
     start_lat = 47.733162
@@ -238,46 +273,23 @@ async def upload_to_phone_test():
         1033599.7563652992,
     ]
 
-    run_to_upload = UploadedRun()
-    run_to_upload.totalDistance = total_distance
-    run_to_upload.startTime = start_time
-    run_to_upload.startLat = start_lat
-    run_to_upload.startLon = start_lon
-    run_to_upload.trackStartPoint = track_start_point
-    run_to_upload.compLatDist.extend(comp_lat_dist)
-    run_to_upload.compLat.extend(comp_lat)
-    run_to_upload.compLonDist.extend(comp_lon_dist)
-    run_to_upload.compLon.extend(comp_lon)
-    run_to_upload.savedTime.extend(saved_time)
+    run_data = UploadedRun()
+    run_data.totalDistance = total_distance
+    run_data.startTime = start_time
+    run_data.startLat = start_lat
+    run_data.startLon = start_lon
+    run_data.trackStartPoint = track_start_point
+    run_data.compLatDist.extend(comp_lat_dist)
+    run_data.compLat.extend(comp_lat)
+    run_data.compLonDist.extend(comp_lon_dist)
+    run_data.compLon.extend(comp_lon)
+    run_data.savedTime.extend(saved_time)
 
-    print(run_to_upload)
+    print(run_data)
 
-    await ble_microchip.open_connection()
-    await ble_microchip.connect_to_device()
-
-    await sync_run.upload_run(run_to_upload)
-    print("Finished transmitting data.")
-
-
-async def watch_test():
-    await ble_microchip.open_connection()
-    await ble_microchip.connect_to_device()
-    print("Began fetching watch data...")
-
-    main_loop = asyncio.get_event_loop()
-    main_loop.create_task(watch.fetch_watch_data())
-
-    while True:
-        await asyncio.sleep(1)
-        watch_data = watch.watch_data
-        print("Latitude: " + str(watch_data.latitude))
-        print("Longitude: " + str(watch_data.longitude))
-        print("Altitude: " + str(watch_data.altitude))
-        print("Speed: " + str(watch_data.speed))
-        print("Heart Rate: " + str(watch_data.heart_rate))
-        print("Total packets received: " + str(watch.packets_received))
-        print("**********")
-        print()
+    file = open(file_path, "wb")
+    file.write(run_data.SerializeToString())
+    file.close()
 
 
 if __name__ == "__main__":

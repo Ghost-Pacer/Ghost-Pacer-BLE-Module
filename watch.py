@@ -20,11 +20,13 @@ has already connected to the Apple Watch.
 from collections import namedtuple
 
 import ble_microchip
+import time
 
 WatchData = namedtuple("WatchData", "latitude longitude altitude speed heart_rate")
 
 watch_data = WatchData(0.0, 0.0, 0.0, 0.0, 0.0)
 packets_received = 0
+packet_latencies = []
 
 _handle_table = {
     "0094": "latitude",
@@ -38,20 +40,26 @@ _handle_table = {
 async def fetch_watch_data():
     global watch_data
     global packets_received
+    global packet_latencies
 
     current_data = {"0094": 0.0, "0096": 0.0, "009A": 0.0, "0098": 0.0, "0092": 0.0}
 
     while True:
+        start_time = time.perf_counter()
+
         handle, value = await _rx_watch_data_packet()
+
+        stop_time = time.perf_counter()
+        packet_latency = stop_time - start_time
+        if packets_received % 5 != 0:
+            packet_latencies.append(packet_latency)
+
         if not handle:
             continue
 
         current_data[handle] = value
         watch_data = WatchData(
-            **{
-                _handle_table[handle]: current_data[handle]
-                for handle in current_data.keys()
-            }
+            **{_handle_table[handle]: current_data[handle] for handle in current_data.keys()}
         )
         packets_received += 1
 
